@@ -1,0 +1,28 @@
+language: generic
+sudo: required
+
+services:
+  - docker
+
+before_install:
+  - docker build -t naresh4005/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run  naresh4005/react-test npm test -- --coverage
+
+after_success:
+  - docker build -t naresh4005/multi-client ./client
+  - docker build -t naresh4005/multi-nginx ./nginx
+  - docker build -t naresh4005/multi-server ./server
+  - docker build -t naresh4005/multi-worker ./worker
+  # Logininto the Docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "DOCKER_ID" --password-stdin
+  #Take those images and push them into GitHub
+  - docker build -t naresh4005/multi-client
+  - docker build -t naresh4005/multi-nginx
+  - docker build -t naresh4005/multi-server
+  - docker build -t naresh4005/multi-worker
+  
+
+
+
